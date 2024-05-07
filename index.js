@@ -19,25 +19,55 @@ function loadMainPrompts() {
       name: "action",
       message: "What would you like to do?",
       choices: [
-        "View all employees",
-        "Add an employee",
-        "Remove employee",
-        "View all departments",
-        "Add a department",
-        "Remove department",
-        "View all roles",
-        "Add a role",
-        "Remove role",
-        "Update employee role",
-        "Update manager role",
-        "View employees by manager",
-        "View employees by department",
-        "View budget by department",
+        "View",
+        "Add",
+        "Remove",
+        "Update",
         "Quit"
       ]
     }
   ]).then((res) => {
     switch (res.action) {
+      case "View":
+        viewOptions();
+        break;
+      case "Add":
+        addOptions();
+        break;
+      case "Remove":
+        removeOptions();
+        break;
+      case "Update":
+        updateOptions();
+        break;
+      case "Quit":
+        quit();
+        break;
+      default:
+        console.error("Invalid choice");
+    }
+  }).catch((error) => {
+    console.error("Error loading main prompts:", error);
+  });
+}
+
+function viewOptions() {
+  prompt([
+    {
+      type: "list",
+      name: "viewAction",
+      message: "What would you like to view?",
+      choices: [
+        "View all employees",
+        "View all roles",
+        "View all departments",
+        "View employees by manager",
+        "View employees by department",
+        "View budget by department"
+      ]
+    }
+  ]).then((res) => {
+    switch (res.viewAction) {
       case "View all employees":
         viewEmployees();
         break;
@@ -46,30 +76,6 @@ function loadMainPrompts() {
         break;
       case "View all departments":
         viewDepartments();
-        break;
-      case "Add an employee":
-        addEmployee();
-        break;
-      case "Add a role":
-        addRole();
-        break;
-      case "Update employee role":
-        updateEmployeeRole();
-        break;
-      case "Add a department":
-        addDepartment();
-        break;
-      case "Remove employee":
-        removeEmployee();
-        break;
-      case "Remove department":
-        removeDepartment();
-        break;
-      case "Remove role":
-        removeRole();
-        break;
-      case "Update manager role":
-        updateEmployeeManager();
         break;
       case "View employees by manager":
         viewEmployeesByManager();
@@ -80,14 +86,100 @@ function loadMainPrompts() {
       case "View budget by department":
         viewBudgetByDepartment();
         break;
-      case "Quit":
-        quit();
-        break;
       default:
-        console.error("Invalid choice");
+        console.error("Invalid view choice");
     }
   }).catch((error) => {
-    console.error("Error loading main prompts:", error);
+    console.error("Error loading view options:", error);
+  });
+}
+
+function addOptions() {
+  prompt([
+    {
+      type: "list",
+      name: "addAction",
+      message: "What would you like to add?",
+      choices: [
+        "Add an employee",
+        "Add a role",
+        "Add a department"
+      ]
+    }
+  ]).then((res) => {
+    switch (res.addAction) {
+      case "Add an employee":
+        addEmployee();
+        break;
+      case "Add a role":
+        addRole();
+        break;
+      case "Add a department":
+        addDepartment();
+        break;
+      default:
+        console.error("Invalid add choice");
+    }
+  }).catch((error) => {
+    console.error("Error loading add options:", error);
+  });
+}
+
+function removeOptions() {
+  prompt([
+    {
+      type: "list",
+      name: "removeAction",
+      message: "What would you like to remove?",
+      choices: [
+        "Remove an employee",
+        "Remove a role",
+        "Remove a department"
+      ]
+    }
+  ]).then((res) => {
+    switch (res.removeAction) {
+      case "Remove an employee":
+        removeEmployee();
+        break;
+      case "Remove a role":
+        removeRole();
+        break;
+      case "Remove a department":
+        removeDepartment();
+        break;
+      default:
+        console.error("Invalid remove choice");
+    }
+  }).catch((error) => {
+    console.error("Error loading remove options:", error);
+  });
+}
+
+function updateOptions() {
+  prompt([
+    {
+      type: "list",
+      name: "updateAction",
+      message: "What would you like to update?",
+      choices: [
+        "Update an employee's role",
+        "Update an employee's manager"
+      ]
+    }
+  ]).then((res) => {
+    switch (res.updateAction) {
+      case "Update an employee's role":
+        updateEmployeeRole();
+        break;
+      case "Update an employee's manager":
+        updateEmployeeManager();
+        break;
+      default:
+        console.error("Invalid update choice");
+    }
+  }).catch((error) => {
+    console.error("Error loading update options:", error);
   });
 }
 
