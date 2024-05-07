@@ -22,16 +22,12 @@ class DB {
     );
   }
 
-  async findEmployeesExcept(id) {
-    const sql = `
-      SELECT e.*, r.title AS role_title, d.name AS department_name, m.first_name || ' ' || m.last_name AS manager_name
-      FROM employees e
-      LEFT JOIN roles r ON e.role_id = r.id
-      LEFT JOIN departments d ON e.department_id = d.id
-      LEFT JOIN employees m ON e.manager_id = m.id
-      WHERE e.id <> $1
-    `;
-    return this.query(sql, [id]);
+  async viewDepartmentBudgets() {
+    return this.query(
+      `SELECT department.id, department.name, SUM(role.salary)
+       AS utilized_budget FROM employee LEFT JOIN role on employee.role_id = role.id
+        LEFT JOIN department on role.department_id = department.id GROUP BY department.id, department.name;`
+    );
   }
 
   findAllPossibleManagers(employeeId) {
@@ -89,16 +85,6 @@ class DB {
   async findAllDepartments() {
     return this.query('SELECT department.id, department.name FROM department;');
   }
-
-  // Find all departments, join with employees and roles and sum up utilized department budget
-  viewDepartmentBudgets() {
-    return this.query(
-      `SELECT department.id, department.name, SUM(role.salary) AS utilized_budget FROM employee 
-      LEFT JOIN role on employee.role_id = role.id 
-      LEFT JOIN department on role.department_id = department.id GROUP BY department.id, department.name;`
-    );
-  }
-
 
   async createDepartment(department) {
     return this.query('INSERT INTO department (name) VALUES ($1)', [

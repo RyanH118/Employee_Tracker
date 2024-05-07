@@ -32,6 +32,7 @@ function loadMainPrompts() {
         "Update manager role",
         "View employees by manager",
         "View employees by department",
+        "View budget by department",
         "Quit"
       ]
     }
@@ -75,6 +76,9 @@ function loadMainPrompts() {
         break;
       case "View employees by department":
         viewEmployeesByDepartment();
+        break;
+      case "View budget by department":
+        viewBudgetByDepartment();
         break;
       case "Quit":
         quit();
@@ -436,6 +440,15 @@ function viewEmployeesByDepartment() {
   });
 }
 
+function viewBudgetByDepartment() {
+  db.viewDepartmentBudgets()
+    .then(({ rows }) => {
+      let departments = rows;
+      console.log("Viewing budget of department");
+      console.table(departments);
+    })
+    .then(() => loadMainPrompts());
+}
 
 function quit() {
   console.log("See you later!");
