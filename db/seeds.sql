@@ -6,7 +6,7 @@ VALUES
     ('Sales'),
     ('Accounting'),
     ('HR'),
-    ('Activities');
+    ('Security');
 
 
 INSERT INTO role

@@ -34,20 +34,12 @@ class DB {
     return this.query(sql, [id]);
   }
 
-  async createEmployee(employeeData) {
-    const sql = `
-      INSERT INTO employees (first_name, last_name, email, role_id, department_id, manager_id)
-      VALUES ($1, $2, $3, $4, $5, $6)
-      RETURNING *
-    `;
-    return this.query(sql, [
-      employeeData.firstName,
-      employeeData.lastName,
-      employeeData.email,
-      employeeData.roleId,
-      employeeData.departmentId,
-      employeeData.managerId,
-    ]);
+  async createEmployee(employee) {
+    const { first_name, last_name, role_id, manager_id } = employee;
+    return this.query(
+      'INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ($1, $2, $3, $4)',
+      [first_name, last_name, role_id, manager_id]
+    );
   }
 
   async removeEmployee(id) {
@@ -56,8 +48,10 @@ class DB {
   }
 
   async updateEmployeeRole(employeeId, roleId) {
-    const sql = `UPDATE employees SET role_id = $2 WHERE id = $1`;
-    return this.query(sql, [employeeId, roleId]);
+    return this.query('UPDATE employee SET role_id = $1 WHERE id = $2', [
+      roleId,
+      employeeId,
+    ]);
   }
 
   async updateEmployeeManager(employeeId, managerId) {
@@ -66,21 +60,18 @@ class DB {
   }
 
   async findAllRoles() {
-    const sql = `
-      SELECT r.*, d.name AS department_name
-      FROM roles r
-      LEFT JOIN departments d ON r.department_id = d.id
-    `;
-    return this.query(sql);
+    return this.query(
+      `SELECT role.id, role.title, department.name AS department, role.salary FROM role
+       LEFT JOIN department on role.department_id = department.id;`
+    );
   }
 
-  async createRole(roleData) {
-    const sql = `
-      INSERT INTO roles (title, department_id)
-      VALUES ($1, $2)
-      RETURNING *
-    `;
-    return this.query(sql, [roleData.title, roleData.departmentId]);
+  async createRole(role) {
+    const { title, salary, department_id } = role;
+    return this.query(
+      'INSERT INTO role (title, salary, department_id) VALUES ($1, $2, $3)',
+      [title, salary, department_id]
+    );
   }
 
   async removeRole(id) {
@@ -89,17 +80,23 @@ class DB {
   }
 
   async findAllDepartments() {
-    const sql = `SELECT * FROM departments`;
-    return this.query(sql);
+    return this.query('SELECT department.id, department.name FROM department;');
   }
 
-  async createDepartment(departmentData) {
-    const sql = `
-      INSERT INTO departments (name, budget)
-      VALUES ($1, $2)
-      RETURNING *
-    `;
-    return this.query(sql, [departmentData.name, departmentData.budget]);
+  // Find all departments, join with employees and roles and sum up utilized department budget
+  viewDepartmentBudgets() {
+    return this.query(
+      `SELECT department.id, department.name, SUM(role.salary) AS utilized_budget FROM employee 
+      LEFT JOIN role on employee.role_id = role.id 
+      LEFT JOIN department on role.department_id = department.id GROUP BY department.id, department.name;`
+    );
+  }
+
+
+  async createDepartment(department) {
+    return this.query('INSERT INTO department (name) VALUES ($1)', [
+      department.name,
+    ]);
   }
 
   async removeDepartment(id) {
