@@ -59,10 +59,16 @@ function loadMainPrompts() {
     });
   }
 
-function viewEmployees() {
-    // View employees
-    console.log("Viewing all employees");
+  function viewEmployees() {
+    db.findAllEmployees()
+      .then(({ rows }) => {
+        let employees = rows;
+        console.log("Viewing all employees");
+        console.table(employees);
+      })
+      .then(() => loadMainPrompts());
   }
+  
   
   function addEmployee() {
     // Add employees
