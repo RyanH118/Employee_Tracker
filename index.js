@@ -31,6 +31,7 @@ function loadMainPrompts() {
         "Update employee role",
         "Update manager role",
         "View employees by manager",
+        "View employees by department",
         "Quit"
       ]
     }
@@ -71,6 +72,9 @@ function loadMainPrompts() {
         break;
       case "View employees by manager":
         viewEmployeesByManager();
+        break;
+      case "View employees by department":
+        viewEmployeesByDepartment();
         break;
       case "Quit":
         quit();
@@ -405,6 +409,33 @@ function viewEmployeesByManager() {
       .then(() => loadMainPrompts());
   });
 }
+
+function viewEmployeesByDepartment() {
+  db.findAllDepartments().then(({ rows }) => {
+    let departments = rows;
+    const departmentChoices = departments.map(({ id, name }) => ({
+      name: name,
+      value: id,
+    }));
+
+    prompt([
+      {
+        type: "list",
+        name: "departmentId",
+        message: "Which department would you like to see employees for?",
+        choices: departmentChoices,
+      },
+    ])
+      .then((res) => db.findAllEmployeesByDepartment(res.departmentId))
+      .then(({ rows }) => {
+        let employees = rows;
+        console.log("Viewing employees in this department");
+        console.table(employees);
+      })
+      .then(() => loadMainPrompts());
+  });
+}
+
 
 function quit() {
   console.log("See you later!");

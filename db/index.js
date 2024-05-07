@@ -110,14 +110,13 @@ class DB {
     return this.query('DELETE FROM department WHERE id = $1', [departmentId]);
   }
 
-  async findEmployeesInDepartment(departmentId) {
-    const sql = `
-      SELECT e.*, r.title AS role_title
-      FROM employees e
-      LEFT JOIN roles r ON e.role_id = r.id
-      WHERE e.department_id = $1
-    `;
-    return this.query(sql, [departmentId]);
+  async findAllEmployeesByDepartment(departmentId) {
+    return this.query(
+      `SELECT employee.id, employee.first_name, employee.last_name, role.title
+       FROM employee LEFT JOIN role on employee.role_id = role.id
+        LEFT JOIN department department on role.department_id = department.id WHERE department.id = $1;`,
+      [departmentId]
+    );
   }
 
   async findAllEmployeesByManager(managerId) {
