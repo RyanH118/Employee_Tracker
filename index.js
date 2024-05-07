@@ -29,6 +29,8 @@ function loadMainPrompts() {
         "Add a role",
         "Remove role",
         "Update employee role",
+        "Update manager role",
+        "View employees by manager",
         "Quit"
       ]
     }
@@ -63,6 +65,12 @@ function loadMainPrompts() {
         break;
       case "Remove role":
         removeRole();
+        break;
+      case "Update manager role":
+        updateEmployeeManager();
+        break;
+      case "View employees by manager":
+        viewEmployeesByManager();
         break;
       case "Quit":
         quit();
@@ -321,6 +329,79 @@ async function removeDepartment() {
     })
       .then((res) => db.removeDepartment(res.departmentId))
       .then(() => console.log(`Removed department from the database`))
+      .then(() => loadMainPrompts());
+  });
+}
+
+function updateEmployeeManager() {
+  db.findAllEmployees().then(({ rows }) => {
+    let employees = rows;
+    const employeeChoices = employees.map(({ id, first_name, last_name }) => ({
+      name: `${first_name} ${last_name}`,
+      value: id,
+    }));
+
+    prompt([
+      {
+        type: "list",
+        name: "employeeId",
+        message: "Which employee's manager do you want to update?",
+        choices: employeeChoices,
+      },
+    ]).then((res) => {
+      let employeeId = res.employeeId;
+      db.findAllPossibleManagers(employeeId).then(({ rows }) => {
+        let managers = rows;
+        const managerChoices = managers.map(
+          ({ id, first_name, last_name }) => ({
+            name: `${first_name} ${last_name}`,
+            value: id,
+          })
+        );
+
+        prompt([
+          {
+            type: "list",
+            name: "managerId",
+            message:
+              "Which employee do you want to set as the manager for the selected employee?",
+            choices: managerChoices,
+          },
+        ])
+          .then((res) => db.updateEmployeeManager(employeeId, res.managerId))
+          .then(() => console.log("Updated employee's manager."))
+          .then(() => loadMainPrompts());
+      });
+    });
+  });
+}
+
+function viewEmployeesByManager() {
+  db.findAllEmployees().then(({ rows }) => {
+    let managers = rows;
+    const managerChoices = managers.map(({ id, first_name, last_name }) => ({
+      name: `${first_name} ${last_name}`,
+      value: id,
+    }));
+
+    prompt([
+      {
+        type: "list",
+        name: "managerId",
+        message: "Which manager do you want to see direct reports for?",
+        choices: managerChoices,
+      },
+    ])
+      .then((res) => db.findAllEmployeesByManager(res.managerId))
+      .then(({ rows }) => {
+        let employees = rows;
+        console.log("Viewing employees under this manager.");
+        if (employees.length === 0) {
+          console.log("The selected manager has employees reporting to them.");
+        } else {
+          console.table(employees);
+        }
+      })
       .then(() => loadMainPrompts());
   });
 }

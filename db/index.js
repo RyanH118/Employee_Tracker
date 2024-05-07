@@ -34,6 +34,13 @@ class DB {
     return this.query(sql, [id]);
   }
 
+  findAllPossibleManagers(employeeId) {
+    return this.query(
+      'SELECT id, first_name, last_name FROM employee WHERE id != $1',
+      [employeeId]
+    );
+  }
+
   async createEmployee(employee) {
     const { first_name, last_name, role_id, manager_id } = employee;
     return this.query(
@@ -54,8 +61,10 @@ class DB {
   }
 
   async updateEmployeeManager(employeeId, managerId) {
-    const sql = `UPDATE employees SET manager_id = $2 WHERE id = $1`;
-    return this.query(sql, [employeeId, managerId]);
+    return this.query('UPDATE employee SET manager_id = $1 WHERE id = $2', [
+      managerId,
+      employeeId,
+    ]);
   }
 
   async findAllRoles() {
@@ -111,15 +120,13 @@ class DB {
     return this.query(sql, [departmentId]);
   }
 
-  async findEmployeesByManager(managerId) {
-    const sql = `
-      SELECT e.*, r.title AS role_title, d.name AS department_name
-      FROM employees e
-      LEFT JOIN roles r ON e.role_id = r.id
-      LEFT JOIN departments d ON e.department_id = d.id
-      WHERE e.manager_id = $1
-    `;
-    return this.query(sql, [managerId]);
+  async findAllEmployeesByManager(managerId) {
+    return this.query(
+      `SELECT employee.id, employee.first_name, employee.last_name, department.name AS department, role.title
+       FROM employee LEFT JOIN role on role.id = employee.role_id LEFT JOIN department ON department.id = role.department_id
+        WHERE manager_id = $1;`,
+      [managerId]
+    );
   }
 }
 
