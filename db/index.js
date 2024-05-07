@@ -42,9 +42,8 @@ class DB {
     );
   }
 
-  async removeEmployee(id) {
-    const sql = `DELETE FROM employees WHERE id = $1`;
-    return this.query(sql, [id]);
+  async removeEmployee(employeeId) {
+    return this.query('DELETE FROM employee WHERE id = $1', [employeeId]);
   }
 
   async updateEmployeeRole(employeeId, roleId) {
@@ -74,9 +73,8 @@ class DB {
     );
   }
 
-  async removeRole(id) {
-    const sql = `DELETE FROM roles WHERE id = $1`;
-    return this.query(sql, [id]);
+  async removeRole(roleId) {
+    return this.query('DELETE FROM role WHERE id = $1', [roleId]);
   }
 
   async findAllDepartments() {
@@ -99,9 +97,8 @@ class DB {
     ]);
   }
 
-  async removeDepartment(id) {
-    const sql = `DELETE FROM departments WHERE id = $1`;
-    return this.query(sql, [id]);
+  async removeDepartment(departmentId) {
+    return this.query('DELETE FROM department WHERE id = $1', [departmentId]);
   }
 
   async findEmployeesInDepartment(departmentId) {
